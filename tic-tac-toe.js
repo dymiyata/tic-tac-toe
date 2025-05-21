@@ -51,6 +51,15 @@ const GameController = (function () {
         return false;
     }
 
+    function checkBoardFilled() {
+        for (let i = 0; i < 9; i++) {
+            if (!Gameboard.getCell(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     function makeMove(index) {
         const isInvalidMove = Boolean(isGameOver || Gameboard.getCell(index));
         if (isInvalidMove) {
@@ -63,12 +72,14 @@ const GameController = (function () {
 
         if (checkWinner(currentPlayer.symbol)) {
             isGameOver = true;
-            console.log("WINNER");
+            DisplayController.displayWinner();
+        } else if (checkBoardFilled()) {
+            isGameOver = true;
+            DisplayController.displayTie();
         } else {
-            console.log("Not yet");
+            switchCurrentPlayer();
+            DisplayController.displayCurrentPlayer();
         }
-
-        switchCurrentPlayer();
     }
 
     function getCurrentPlayerSymbol() {
@@ -84,6 +95,7 @@ const GameController = (function () {
 const DisplayController = (function () {
     const boardElement = document.getElementById("board");
     const cellElementArray = boardElement.children;
+    const statusMessageElement = document.getElementById("status-message");
 
     for (cellElement of cellElementArray) {
         cellElement.addEventListener("click", function () {
@@ -92,13 +104,31 @@ const DisplayController = (function () {
         });
     }
 
+    function displayCurrentPlayer() {
+        const playerSymbol = GameController.getCurrentPlayerSymbol();
+        statusMessageElement.innerHTML = `Player ${playerSymbol} to move`;
+    }
+
+    function displayWinner() {
+        const playerSymbol = GameController.getCurrentPlayerSymbol();
+        statusMessageElement.innerHTML = `Player ${playerSymbol} Wins!`;
+    }
+
+    function displayTie() {
+        statusMessageElement.innerHTML = `It's a Tie!`;
+    }
+
     function renderBoard() {
         for (let i = 0; i < 9; i++) {
             cellElementArray[i].innerHTML = Gameboard.getCell(i);
         }
     }
 
+
     return {
         renderBoard,
+        displayCurrentPlayer,
+        displayWinner,
+        displayTie
     };
 })();

@@ -5,6 +5,10 @@
 }
 
 .cell {
-    background-color: lightblue;
+    background-color: lightskyblue;
     border: 2px solid white;
+}
+
+.cell:hover {
+    background-color: lightblue;
 }
