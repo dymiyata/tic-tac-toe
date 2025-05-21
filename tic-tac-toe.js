@@ -23,6 +23,7 @@ function createPlayer(symbol) {
 const GameController = (function () {
     const playerX = createPlayer('X');
     const playerO = createPlayer('O');
+    let isGameOver = false;
 
     let currentPlayer = playerX;
 
@@ -51,23 +52,28 @@ const GameController = (function () {
     }
 
     function makeMove(index) {
-        if (Gameboard.getCell(index)) {
+        const isInvalidMove = Boolean(isGameOver || Gameboard.getCell(index));
+        if (isInvalidMove) {
+            console.log("invalid");
             return;
         }
+
         Gameboard.setCell(index, currentPlayer.symbol);
+        DisplayController.renderBoard();
+
         if (checkWinner(currentPlayer.symbol)) {
+            isGameOver = true;
             console.log("WINNER");
         } else {
             console.log("Not yet");
         }
+
         switchCurrentPlayer();
     }
 
     function getCurrentPlayerSymbol() {
         return currentPlayer.symbol;
     }
-
-
 
     return {
         makeMove,
@@ -76,58 +82,23 @@ const GameController = (function () {
 })();
 
 const DisplayController = (function () {
-    return;
+    const boardElement = document.getElementById("board");
+    const cellElementArray = boardElement.children;
+
+    for (cellElement of cellElementArray) {
+        cellElement.addEventListener("click", function () {
+            const cellIndex = Number(this.id);
+            GameController.makeMove(cellIndex);
+        });
+    }
+
+    function renderBoard() {
+        for (let i = 0; i < 9; i++) {
+            cellElementArray[i].innerHTML = Gameboard.getCell(i);
+        }
+    }
+
+    return {
+        renderBoard,
+    };
 })();
-
-
-// function makeMove(symbol, index) {
-//     if (board[index] === '') {
-//         board[index] = symbol;
-//     }
-//     renderBoard();
-// }
-
-// function renderBoard() {
-//     console.log(board.slice(0, 3));
-//     console.log(board.slice(3, 6));
-//     console.log(board.slice(6, 9));
-// }
-
-// function isInWinningRow(position) {
-//     const currentRow = Math.floor(position / 3);
-//     const startOfRowIndex = 3 * currentRow;
-//     if (board[startOfRowIndex] === board[startOfRowIndex + 1] && board[startOfRowIndex] === board[startOfRowIndex + 2]) {
-//         return true;
-//     }
-//     return false;
-// }
-
-// function isInWinningColumn(position) {
-//     const currentColumn = position % 3;
-//     if (board[currentColumn] === board[currentColumn + 3] && board[currentColumn] === board[currentColumn + 2 * 3]) {
-//         return true;
-//     }
-//     return false;
-// }
-
-// function isInWinningDiagonal(position) {
-
-//     const isOnFirstDiag = (position % 4 == 0);
-//     const isFirstDiagEqual = (board[0] == board[4] && board[0] == board[8]);
-//     if (isOnFirstDiag && isFirstDiagEqual) {
-//         return true;
-//     }
-
-//     const isOnSecondDiag = (position % 4 == 2 || position == 4);
-//     const isSecondDiagEqual = (board[2] == board[4] && board[0] == board[6]);
-//     if (isOnSecondDiag && isSecondDiagEqual) {
-//         return true;
-//     }
-
-//     return false;
-
-// }
-
-// function isWinningMove(position) {
-//     return isInWinningRow(position) || isInWinningColumn(position) || isInWinningDiagonal(position);
-// }
