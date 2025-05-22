@@ -7,10 +7,11 @@
 .cell {
     background-color: lightskyblue;
     border: 2px solid white;
+    transition: opacity 0.3s;
 }
 
 .cell:hover {
-    background-color: lightblue;
+    opacity: 0.7;
 }
 
 .highlight {
