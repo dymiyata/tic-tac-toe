@@ -86,9 +86,18 @@ const GameController = (function () {
         return currentPlayer.symbol;
     }
 
+    function resetGame() {
+        isGameOver = false;
+        currentPlayer = playerX;
+        for (let i = 0; i < 9; i++) {
+            Gameboard.setCell(i, "");
+        }
+    }
+
     return {
         makeMove,
         getCurrentPlayerSymbol,
+        resetGame,
     }
 })();
 
@@ -96,26 +105,40 @@ const DisplayController = (function () {
     const boardElement = document.getElementById("board");
     const cellElementArray = boardElement.children;
     const statusMessageElement = document.getElementById("status-message");
+    const resetButton = document.getElementById("reset-button");
 
-    for (cellElement of cellElementArray) {
-        cellElement.addEventListener("click", function () {
-            const cellIndex = Number(this.id);
-            GameController.makeMove(cellIndex);
+    function init() {
+        for (cellElement of cellElementArray) {
+            cellElement.addEventListener("click", function () {
+                const cellIndex = Number(this.id);
+                GameController.makeMove(cellIndex);
+            });
+        }
+
+        displayCurrentPlayer();
+
+        resetButton.addEventListener("click", function () {
+            GameController.resetGame();
+            renderBoard();
+            displayCurrentPlayer();
         });
     }
 
     function displayCurrentPlayer() {
         const playerSymbol = GameController.getCurrentPlayerSymbol();
         statusMessageElement.innerHTML = `Player ${playerSymbol} to move`;
+        resetButton.innerHTML = "Restart Game"
     }
 
     function displayWinner() {
         const playerSymbol = GameController.getCurrentPlayerSymbol();
         statusMessageElement.innerHTML = `Player ${playerSymbol} Wins!`;
+        resetButton.innerHTML = "Play Again?";
     }
 
     function displayTie() {
         statusMessageElement.innerHTML = `It's a Tie!`;
+        resetButton.innerHTML = "Play Again?"
     }
 
     function renderBoard() {
@@ -126,9 +149,12 @@ const DisplayController = (function () {
 
 
     return {
+        init,
         renderBoard,
         displayCurrentPlayer,
         displayWinner,
         displayTie
     };
 })();
+
+DisplayController.init();
