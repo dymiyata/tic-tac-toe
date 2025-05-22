@@ -45,10 +45,10 @@ const GameController = (function () {
                 Gameboard.getCell(combo[2]) == symbol
             );
             if (isComboMatchingSymbol) {
-                return true;
+                return combo;
             }
         }
-        return false;
+        return null;
     }
 
     function checkBoardFilled() {
@@ -70,9 +70,11 @@ const GameController = (function () {
         Gameboard.setCell(index, currentPlayer.symbol);
         DisplayController.renderBoard();
 
-        if (checkWinner(currentPlayer.symbol)) {
+        let winningCombo = checkWinner(currentPlayer.symbol);
+
+        if (winningCombo) {
             isGameOver = true;
-            DisplayController.displayWinner();
+            DisplayController.displayWinner(winningCombo);
         } else if (checkBoardFilled()) {
             isGameOver = true;
             DisplayController.displayTie();
@@ -120,8 +122,22 @@ const DisplayController = (function () {
         resetButton.addEventListener("click", function () {
             GameController.resetGame();
             renderBoard();
+            lowlightAllCells();
             displayCurrentPlayer();
         });
+    }
+
+    function highlightCells(cellArray) {
+        for (index of cellArray) {
+            cellElementArray[index].classList.add("highlight");
+        }
+    }
+
+    function lowlightAllCells() {
+        for (cellElement of cellElementArray) {
+            cellElement.classList.remove("highlight");
+        }
+
     }
 
     function displayCurrentPlayer() {
@@ -130,10 +146,11 @@ const DisplayController = (function () {
         resetButton.innerHTML = "Restart Game"
     }
 
-    function displayWinner() {
+    function displayWinner(winningCombo) {
         const playerSymbol = GameController.getCurrentPlayerSymbol();
         statusMessageElement.innerHTML = `Player ${playerSymbol} Wins!`;
         resetButton.innerHTML = "Play Again?";
+        highlightCells(winningCombo);
     }
 
     function displayTie() {
